@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "ru.practicum.sprint11koh9"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ru.practicum.sprint11koh9"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
