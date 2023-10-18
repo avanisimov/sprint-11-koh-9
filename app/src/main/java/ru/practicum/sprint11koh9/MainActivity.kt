@@ -27,23 +27,32 @@ class MainActivity : AppCompatActivity() {
 
         val itemsRv: RecyclerView = findViewById(R.id.items)
         itemsRv.adapter = adapter
-
         val retrofit = Retrofit.Builder()
             .baseUrl("https://raw.githubusercontent.com/avanisimov/sprint-11-koh-9/")
             .addConverterFactory(
                 GsonConverterFactory.create(
                     GsonBuilder()
                         .registerTypeAdapter(Date::class.java, CustomDateTypeAdapter())
+                        .registerTypeAdapter(NewsItem::class.java, NewsItemTypeAdapter())
                         .create()
                 )
             )
             .build()
+
         val serverApi = retrofit.create(Sprint11ServerApi::class.java)
 
         serverApi.getNews1().enqueue(object : Callback<NewsResponse> {
             override fun onResponse(call: Call<NewsResponse>, response: Response<NewsResponse>) {
                 Log.d(TAG, "onResponse: ${response.body()}")
-                adapter.items = response.body()?.data?.items ?: emptyList()
+                adapter.items = response.body()?.data?.items?.filter {
+                    it !is NewsItem.Unknown
+                }?.map {
+                    when (it) {
+                        is NewsItem.Science -> it.copy(created = Date())
+                        is NewsItem.Sport -> it
+                        is NewsItem.Unknown -> it
+                    }
+                } ?: emptyList()
             }
 
             override fun onFailure(call: Call<NewsResponse>, t: Throwable) {
@@ -59,6 +68,6 @@ class MainActivity : AppCompatActivity() {
 interface Sprint11ServerApi {
 
 
-    @GET("main/jsons/news_1.json")
+    @GET("main/jsons/news_2.json")
     fun getNews1(): Call<NewsResponse>
 }

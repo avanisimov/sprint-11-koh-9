@@ -2,8 +2,10 @@ package ru.practicum.sprint11koh9
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import java.text.DateFormat
 
 class NewsAdapter : RecyclerView.Adapter<NewsItemViewHolder>() {
@@ -38,14 +40,31 @@ class NewsItemViewHolder(
 
     private val title: TextView = itemView.findViewById(R.id.title)
     private val created: TextView = itemView.findViewById(R.id.created)
+    private val image: ImageView = itemView.findViewById(R.id.image)
 
     fun bind(item: NewsItem) {
-        title.text = item.title
         created.text =
             DateFormat.getDateTimeInstance(
-                DateFormat.SHORT,
+                DateFormat.MEDIUM,
                 DateFormat.SHORT
             ).format(item.created)
+        when (item) {
+            is NewsItem.Science -> {
+                title.text = item.title
+                Glide.with(itemView.context)
+                    .load(item.specificPropertyForScience)
+                    .into(image)
+            }
+
+            is NewsItem.Sport -> {
+                title.text = "${item.title} ${item.specificPropertyForSport}"
+            }
+
+            is NewsItem.Unknown -> {
+                title.text = item.title
+            }
+        }
+
 
     }
 }
